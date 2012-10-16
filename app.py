@@ -76,4 +76,7 @@ if __name__ == '__main__':
     file_name = "list_of_actors.json"
     if not os.path.exists(file_name):
         list_of_actors_del()
-    app.run()
+    app.run(
+        host='0.0.0.0',
+        port=80
+    )
