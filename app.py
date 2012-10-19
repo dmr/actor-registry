@@ -17,7 +17,7 @@ def load_list_of_actors():
 
 def update_list_of_actors():
     actors = load_list_of_actors()
-    for uri in list_of_actors.keys():
+    for uri in actors.keys():
         try:
             resp = urllib2.urlopen(uri, timeout=2)
             print uri,':',resp.read()
