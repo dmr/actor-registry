@@ -15,6 +15,19 @@ def load_list_of_actors():
         return json.load(fp)
 
 
+def update_list_of_actors():
+    actors = load_list_of_actors()
+    for uri in list_of_actors.keys():
+        try:
+            resp = urllib2.urlopen(uri, timeout=2)
+            print uri,':',resp.read()
+            actors[uri] = time.time()
+        except urllib2.URLError as exc:
+            print "Actor down:", uri, exc
+            actors.pop(uri)
+    save_list_of_actors(actors)
+
+
 def save_list_of_actors(lst):
     try:
         json_data = json.dumps(lst)
@@ -28,45 +41,36 @@ def save_list_of_actors(lst):
 
 @app.route("/", methods=['get'])
 def list_of_actors_get():
-    list_of_actors = load_list_of_actors()
-    return json.dumps(list_of_actors.keys())
+    return json.dumps(update_list_of_actors().keys())
 
 
 @app.route("/detail/", methods=['get'])
 def list_of_actors_detail_get():
-    list_of_actors = load_list_of_actors()
-
-    list_of_actors_changed = False
-    for uri in list_of_actors.keys():
-        try:
-            resp = urllib2.urlopen(uri)
-            print uri,':',resp.read()
-        except urllib2.URLError as exc:
-            print exc
-            list_of_actors.pop(uri)
-            list_of_actors_changed = True
-
-    if list_of_actors_changed:
-        save_list_of_actors(list_of_actors)
-
-    return json.dumps(list_of_actors)
+    actors = update_list_of_actors()
+    out = ["<ul>"]
+    out.extend([
+        "<li>{0} {1}</li>".format(k, v)
+        for k,v in actors.items()
+    ])
+    out.append(
+        "Actor count: {0}".format(len(actors.keys()))
+    )
+    return u"<br />".join(out)
 
 
 @app.route("/", methods=['post'])
 def list_of_actors_post():
-    list_of_actors = load_list_of_actors()
+    actors = load_list_of_actors()
     for data_stream in request.form:
         data_json = json.loads(data_stream)
         for actor_uri in data_json:
-            list_of_actors[actor_uri] = time.time()
-
-    save_list_of_actors(list_of_actors)
-
+            actors[actor_uri] = time.time()
+    save_list_of_actors(actors)
     return "ok."
 
 
 @app.route("/", methods=['delete'])
-def list_of_actors_del():
+def create_new_empty_actors_file():
     # check security?
     with open(file_name, 'wb') as fp:
         json.dump({}, fp)
@@ -75,7 +79,7 @@ def list_of_actors_del():
 if __name__ == '__main__':
     file_name = "list_of_actors.json"
     if not os.path.exists(file_name):
-        list_of_actors_del()
+        create_new_empty_actors_file()
     app.run(
         host='0.0.0.0',
         port=80
