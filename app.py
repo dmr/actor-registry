@@ -26,6 +26,7 @@ def update_list_of_actors():
             print "Actor down:", uri, exc
             actors.pop(uri)
     save_list_of_actors(actors)
+    return actors
 
 
 def save_list_of_actors(lst):
