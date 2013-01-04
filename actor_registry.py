@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import urllib2
 import os
@@ -71,17 +70,38 @@ def list_of_actors_post():
 
 
 @app.route("/", methods=['delete'])
-def create_new_empty_actors_file():
+def create_new_empty_actors_file(file_name):
     # check security?
     with open(file_name, 'wb') as fp:
         json.dump({}, fp)
 
 
-if __name__ == '__main__':
+def main():
     file_name = "list_of_actors.json"
     if not os.path.exists(file_name):
-        create_new_empty_actors_file()
-    app.run(
-        host='0.0.0.0',
-        port=80
+        create_new_empty_actors_file(file_name)
+
+    import argparse
+    parser = argparse.ArgumentParser(
+        "smart_grid_actor",
+        description=(
+            "Starts a Smart Grid Actor."
+            )
     )
+    parser.add_argument('--host', action="store",
+        type=str, help=("Hostname/IP address to bind the "
+                        "server socket to. Default: <your ip address>"),
+        default='0.0.0.0'
+    )
+    parser.add_argument('-p', '--port', type=int,
+        help=("Port to bind the "
+              "server socket to. Default: 80"),
+        default=80
+    )
+    args = parser.parse_args()
+
+    try:
+        import bjoern
+        bjoern.run(app, args.host, args.port)
+    except ImportError:
+        app.run(host=args.host, port=args.port)
