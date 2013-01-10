@@ -6,7 +6,7 @@ This small web app starts a server that allows to register urls and returns regi
 Usage example
 -------------
 
-1. Install and start the callback app::
+1. Install and start the actor_registry HTTP server::
 
     virtualenv env
     source env/bin/activate
