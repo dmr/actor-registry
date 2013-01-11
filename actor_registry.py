@@ -83,9 +83,9 @@ def main():
 
     import argparse
     parser = argparse.ArgumentParser(
-        "smart_grid_actor",
+        "actor_registry",
         description=(
-            "Starts a Smart Grid Actor."
+            "Starts a Actor-Registry server. Usage for callbacks from Smart Grid Actors."
             )
     )
     parser.add_argument('--host', action="store",
