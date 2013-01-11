@@ -11,8 +11,8 @@ setup(
     author_email='danielmrech@gmail.com',
     description=('This small web app starts a server that allows to register urls and returns registered urls'),
     long_description=open('README.rst').read(),
-
-    packages=find_packages(),
+    
+    py_modules= ['actor_registry'],
 
     entry_points={
         'console_scripts': [
